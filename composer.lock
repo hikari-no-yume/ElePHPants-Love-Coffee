@@ -1,0 +1,55 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "d77e9ba3e0370bc7ad875e4b702ab833",
+    "packages": [
+        {
+            "name": "theodorejb/polycast",
+            "version": "v0.9.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/theodorejb/PolyCast.git",
+                "reference": "c8b410c5364f2a94ba992401f003541fbe6093b8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/theodorejb/PolyCast/zipball/c8b410c5364f2a94ba992401f003541fbe6093b8",
+                "reference": "c8b410c5364f2a94ba992401f003541fbe6093b8",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.5"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "lib/PolyCast.php",
+                    "lib/CastException.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Theodore Brown",
+                    "email": "theodorejb@outlook.com"
+                }
+            ],
+            "description": "Safely cast values to int, float, or string",
+            "time": "2015-03-18 00:37:48"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}

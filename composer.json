@@ -1,0 +1,16 @@
+{
+    "require": {
+        "theodorejb/polycast": "~0.9"
+    },
+    "autoload": {
+        "files": [
+            "src/constants.php",
+            "src/parser.php",
+            "src/utils.php",
+            "src/zendFunctions.php"
+        ],
+        "psr-4": {
+            "ajf\\ElePHPants_Love_Coffee\\": "src"
+        }
+    }
+}
