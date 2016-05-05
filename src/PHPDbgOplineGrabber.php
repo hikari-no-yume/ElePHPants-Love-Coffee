@@ -5,7 +5,7 @@ namespace ajf\ElePHPants_Love_Coffee;
 
 use function theodorejb\polycast\to_int;
 
-class PHPDbgOpcodeReader implements OpcodeReader
+class PHPDbgOplineGrabber implements OplineGrabber
 {
     private $binaryPath;
 

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace ajf\ElePHPants_Love_Coffee;
 
-interface OpcodeReader
+interface OplineGrabber
 {
     public function compileFile(string $filePath): OplineArray;
 

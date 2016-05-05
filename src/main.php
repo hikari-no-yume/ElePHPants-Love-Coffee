@@ -10,12 +10,12 @@ switch ([$argc, $argv[1] ?? '']) {
         $phpdbgPath = $argv[2];
         $infile = $argv[3];
 
-        $reader = new PHPDbgOpcodeReader($phpdbgPath);
+        $grabber = new PHPDbgOplineGrabber($phpdbgPath);
         break;
     case [3, '-inspector']:
         $infile = $argv[2];
 
-        $reader = new InspectorOpcodeReader;
+        $grabber = new InspectorOplineGrabber;
         break;
     default:
         echo "Usage:", PHP_EOL;
@@ -26,7 +26,7 @@ switch ([$argc, $argv[1] ?? '']) {
         die();
 }
 
-$spider = new Spider($reader, $infile);
+$spider = new Spider($grabber, $infile);
 
 $functions = $spider->spiderFile();
 

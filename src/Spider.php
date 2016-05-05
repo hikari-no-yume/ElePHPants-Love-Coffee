@@ -5,20 +5,20 @@ namespace ajf\ElePHPants_Love_Coffee;
 
 class Spider
 {
-    private $reader;
+    private $grabber;
     private $filename;
     private $functions;
 
-    public function __construct(OpcodeReader $reader, string $filename) {
-        $this->reader = $reader;
+    public function __construct(OplineGrabber $grabber, string $filename) {
+        $this->grabber = $grabber;
         $this->filename = $filename;
     }
 
     private function getFunction(string $function = NULL): OplineArray {
         if ($function === NULL) {
-            return $this->reader->compileFile($this->filename);
+            return $this->grabber->compileFile($this->filename);
         } else {
-            return $this->reader->compileFunctionInFile($this->filename, $function);
+            return $this->grabber->compileFunctionInFile($this->filename, $function);
         }
     }
 

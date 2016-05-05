@@ -5,7 +5,7 @@ namespace ajf\ElePHPants_Love_Coffee;
 
 use Inspector;
 
-class InspectorOpcodeReader implements OpcodeReader
+class InspectorOplineGrabber implements OplineGrabber
 {
     private $seenFiles = [];
 
