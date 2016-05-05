@@ -5,7 +5,6 @@
     "autoload": {
         "files": [
             "src/constants.php",
-            "src/parser.php",
             "src/utils.php",
             "src/zendFunctions.php"
         ],

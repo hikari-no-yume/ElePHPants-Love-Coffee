@@ -5,27 +5,21 @@ namespace ajf\ElePHPants_Love_Coffee;
 
 class Spider
 {
-    private $phpdbg;
+    private $reader;
     private $filename;
     private $functions;
 
-    public function __construct(PHPDbg $phpdbg, string $filename) {
-        $this->phpdbg = $phpdbg;
+    public function __construct(OpcodeReader $reader, string $filename) {
+        $this->reader = $reader;
         $this->filename = $filename;
     }
 
     private function getFunction(string $function = NULL): OpcodeArray {
         if ($function === NULL) {
-            $listing = $this->phpdbg->showFile($this->filename);
+            return $this->reader->compileFile($this->filename);
         } else {
-            $listing = $this->phpdbg->showFileFunction($this->filename, $function);
+            return $this->reader->compileFunctionInFile($this->filename, $function);
         }
-
-        if (preg_match('/^\tInternal .+\(\)\s*$/', $listing[1])) {
-            throw new \Exception("ElePHPants Love Coffee does not currently support the internal/extension function $function()");
-        }
-
-        return parseOpcodes($listing);
     }
 
     private function spiderFunction(OpcodeArray $oparray) {

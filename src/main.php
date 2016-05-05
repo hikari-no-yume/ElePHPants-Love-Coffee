@@ -14,8 +14,8 @@ if ($argc !== 3) {
 $phpdbgPath = $argv[1];
 $infile = $argv[2];
 
-$phpdbg = new PHPDbg($phpdbgPath);
-$spider = new Spider($phpdbg, $infile);
+$reader = new PHPDbgOpcodeReader($phpdbgPath);
+$spider = new Spider($reader, $infile);
 
 $functions = $spider->spiderFile();
 
