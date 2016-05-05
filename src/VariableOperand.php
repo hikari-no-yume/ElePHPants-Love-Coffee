@@ -14,4 +14,8 @@ class VariableOperand extends Operand
     public function getNumber(): int {
         return $this->number;
     }
+
+    public function __toString(): string {
+        return 'r' . $this->number;
+    }
 }

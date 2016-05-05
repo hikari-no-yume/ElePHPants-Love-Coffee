@@ -55,4 +55,12 @@ class OpcodeArray implements \IteratorAggregate
     public function getIterator(): \ArrayIterator {
         return new \ArrayIterator($this->opcodes);
     }
+
+    public function __toString(): string {
+        $str = $this->name . '() - ' . $this->filename . ':' . $this->startLineNumber . '-' . $this->endLineNumber;
+        foreach ($this->opcodes as $opcode) {
+            $str .= "\n" . $opcode->__toString();
+        }
+        return $str;
+    }
 }

@@ -44,4 +44,18 @@ class Opcode
     public function getResult()/* : ?Operand */ {
         return $this->result;
     }
+
+    public function __toString(): string {
+        $str = 'L' . str_pad((string)$this->lineNumber, 4, '0', STR_PAD_LEFT) . ': ';
+        $str .= strtolower(substr(OPCODE_NAMES[$this->type], 5)) . ' ';
+        $operands = [];
+        if ($this->result)
+            $operands[] = $this->result->__toString();
+        if ($this->operand1)
+            $operands[] = $this->operand1->__toString();
+        if ($this->operand2)
+            $operands[] = $this->operand2->__toString();
+        $str .= implode(', ', $operands);
+        return $str;
+    }
 }

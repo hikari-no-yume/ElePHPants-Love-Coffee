@@ -14,4 +14,8 @@ class CompiledVariableOperand extends Operand
     public function getName(): string {
         return $this->name;
     }
+
+    public function __toString(): string {
+        return '$' . $this->name;
+    }
 }

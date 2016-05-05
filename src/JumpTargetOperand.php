@@ -14,4 +14,8 @@ class JumpTargetOperand extends Operand
     public function getOpcodeIndex(): int {
         return $this->opcodeIndex;
     }
+
+    public function __toString(): string {
+        return (string)$this->opcodeIndex;
+    }
 }

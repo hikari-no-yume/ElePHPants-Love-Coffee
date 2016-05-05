@@ -14,4 +14,8 @@ class LiteralOperand extends Operand
     public function getValue() {
         return $this->value;
     }
+
+    public function __toString(): string {
+        return var_export($this->value, true);
+    }
 }
