@@ -13,7 +13,7 @@ class PHPDbgOpcodeReader implements OpcodeReader
         $this->binaryPath = $binaryPath;
     }
 
-    public function compileFile(string $filePath): OpcodeArray {
+    public function compileFile(string $filePath): OplineArray {
         exec(
             escapeshellarg($this->binaryPath)
             . ' -p '
@@ -27,12 +27,12 @@ class PHPDbgOpcodeReader implements OpcodeReader
         
         self::checkInternal($lines);
 
-        $opcodes = self::parseOpcodes($lines);
+        $oplines = self::parseOplines($lines);
 
-        return $opcodes;
+        return $oplines;
     }
 
-    public function compileFunctionInFile(string $filePath, string $functionName): OpcodeArray {
+    public function compileFunctionInFile(string $filePath, string $functionName): OplineArray {
         exec(
             escapeshellarg($this->binaryPath)
             . ' -p=' . escapeshellarg($functionName)
@@ -46,9 +46,9 @@ class PHPDbgOpcodeReader implements OpcodeReader
         
         self::checkInternal($lines);
 
-        $opcodes = self::parseOpcodes($lines);
+        $oplines = self::parseOplines($lines);
 
-        return $opcodes;
+        return $oplines;
     }
 
     private static function checkInternal(array $lines) /* : void */ {
@@ -57,7 +57,7 @@ class PHPDbgOpcodeReader implements OpcodeReader
         }
     }
 
-    private static function parseOpcodes(array $lines): OpcodeArray {
+    private static function parseOplines(array $lines): OplineArray {
         list($nameLine, $fileLine) = $lines;
         $lines = array_slice($lines, 2);
 
@@ -71,7 +71,7 @@ class PHPDbgOpcodeReader implements OpcodeReader
         }
         list(, $startLineNumber, $endLineNumber, $filename) = $matches;
 
-        $oparray = new OpcodeArray(
+        $oparray = new OplineArray(
             $name, $filename, to_int($startLineNumber), to_int($endLineNumber)
         );
 
@@ -102,14 +102,11 @@ class PHPDbgOpcodeReader implements OpcodeReader
                 }
             }, $operandStrings);
             
-            $opcode = new Opcode(
+            $oparray->addOpline(new Opline(
                 to_int($lineNumber),
                 constant('ajf\ElePHPants_Love_Coffee\ZEND_' . $opcodeName),
                 ...$operands
-            );
-            $opcode->name = $opcodeName;
-
-            $oparray->addOpcode($opcode);
+            ));
         }
 
         return $oparray;

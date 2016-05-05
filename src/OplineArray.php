@@ -3,28 +3,28 @@ declare(strict_types=1);
 
 namespace ajf\ElePHPants_Love_Coffee;
 
-class OpcodeArray implements \IteratorAggregate
+class OplineArray implements \IteratorAggregate
 {
     private $name;
     private $filename;
     private $startLineNumber;
     private $endLineNumber;
-    private $opcodes = [];
+    private $oplines = [];
 
     public function __construct(
         string $name,
         string $filename,
         int $startLineNumber,
         int $endLineNumber,
-        array $opcodes = []
+        array $oplines = []
     ) {
         $this->name = $name;
         $this->filename = $filename;
         $this->startLineNumber = $startLineNumber;
         $this->endLineNumber = $endLineNumber;
 
-        foreach ($opcodes as $opcode) {
-            $this->addOpcode($opcode);
+        foreach ($oplines as $opline) {
+            $this->addOpline($opline);
         }
     }
 
@@ -44,22 +44,22 @@ class OpcodeArray implements \IteratorAggregate
         return $this->endLineNumber;
     }
 
-    public function addOpcode(Opcode $opcode) {
-        $this->opcodes[] = $opcode;
+    public function addOpline(Opline $opline) {
+        $this->oplines[] = $opline;
     }
 
-    public function getOpcodes(): array {
-        return $this->opcodes;
+    public function getOplines(): array {
+        return $this->oplines;
     }
 
     public function getIterator(): \ArrayIterator {
-        return new \ArrayIterator($this->opcodes);
+        return new \ArrayIterator($this->oplines);
     }
 
     public function __toString(): string {
         $str = $this->name . '() - ' . $this->filename . ':' . $this->startLineNumber . '-' . $this->endLineNumber;
-        foreach ($this->opcodes as $opcode) {
-            $str .= "\n" . $opcode->__toString();
+        foreach ($this->oplines as $opline) {
+            $str .= "\n" . $opline->__toString();
         }
         return $str;
     }

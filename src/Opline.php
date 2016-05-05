@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace ajf\ElePHPants_Love_Coffee;
 
-class Opcode
+class Opline
 {
     private $lineNumber;
     private $type;

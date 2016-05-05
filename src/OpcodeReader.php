@@ -5,7 +5,7 @@ namespace ajf\ElePHPants_Love_Coffee;
 
 interface OpcodeReader
 {
-    public function compileFile(string $filePath): OpcodeArray;
+    public function compileFile(string $filePath): OplineArray;
 
-    public function compileFunctionInFile(string $filePath, string $functionName): OpcodeArray;
+    public function compileFunctionInFile(string $filePath, string $functionName): OplineArray;
 }

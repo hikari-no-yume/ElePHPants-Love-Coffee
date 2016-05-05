@@ -14,7 +14,7 @@ class Spider
         $this->filename = $filename;
     }
 
-    private function getFunction(string $function = NULL): OpcodeArray {
+    private function getFunction(string $function = NULL): OplineArray {
         if ($function === NULL) {
             return $this->reader->compileFile($this->filename);
         } else {
@@ -22,11 +22,11 @@ class Spider
         }
     }
 
-    private function spiderFunction(OpcodeArray $oparray) {
+    private function spiderFunction(OplineArray $oparray) {
         $this->functions[$oparray->getName()] = $oparray;
-        foreach ($oparray as $opcode) {
-            if ($opcode->getType() === ZEND_INIT_FCALL) {
-                $functionName = $opcode->getOperand2()->getValue();
+        foreach ($oparray as $opline) {
+            if ($opline->getType() === ZEND_INIT_FCALL) {
+                $functionName = $opline->getOperand2()->getValue();
                 if (!isset(PHP_FUNCTIONS[$functionName]) && !isset($this->functions[$functionName])) {
                     $function = $this->getFunction($functionName);
                     $this->spiderFunction($function);

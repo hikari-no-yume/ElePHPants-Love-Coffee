@@ -13,7 +13,7 @@ class InspectorOpcodeReader implements OpcodeReader
      * This currently clobbers the function/class table the compiler is
      * running within.
      */
-    public function compileFile(string $filePath): OpcodeArray {
+    public function compileFile(string $filePath): OplineArray {
         if (!isset($this->seenFiles[$filePath])) {
             $file = new Inspector\File($filePath);
 
@@ -22,7 +22,7 @@ class InspectorOpcodeReader implements OpcodeReader
         return $this->seenFiles[$filePath];
     }
 
-    public function compileFunctionInFile(string $filePath, string $functionName): OpcodeArray {
+    public function compileFunctionInFile(string $filePath, string $functionName): OplineArray {
         // This really shouldn't work: see FIXME/TODO above.
         self::compileFile($filePath);
 
@@ -32,8 +32,8 @@ class InspectorOpcodeReader implements OpcodeReader
         return self::transmogrifyOpcodes($function, $functionName, $filePath);
     }
 
-    private static function transmogrifyOpcodes(Inspector\Scope $scope, string $name, string $filePath): OpcodeArray {
-        $oparray = new OpcodeArray($name, $filePath, $scope->getLineStart(), $scope->getLineEnd());
+    private static function transmogrifyOpcodes(Inspector\Scope $scope, string $name, string $filePath): OplineArray {
+        $oparray = new OplineArray($name, $filePath, $scope->getLineStart(), $scope->getLineEnd());
 
         foreach ($scope as $opline) {
             $operands = array_map([$opline, 'getOperand'], [Inspector\Opline::OP1, Inspector\Opline::OP2, Inspector\Opline::RESULT]);
@@ -56,13 +56,11 @@ class InspectorOpcodeReader implements OpcodeReader
                 }
             }, $operands);
             
-            $opcode = new Opcode(
+            $oparray->addOpline(new Opline(
                 $opline->getLine(),
                 constant('ajf\ElePHPants_Love_Coffee\\' . $opline->getType()),
                 ...$operands
-            );
-
-            $oparray->addOpcode($opcode);
+            ));
         }
 
         return $oparray;

@@ -125,11 +125,11 @@ class Compiler
             $jumpTargets[0] = TRUE;
         }
 
-        foreach ($oparray as $i => $opcode) {
+        foreach ($oparray as $i => $opline) {
             if (isset($jumpTargets[$i])) {
                 $this->emitLine("case " . $i . ":");
             }
-            $this->compileOpcode($opcode);
+            $this->compileOpline($opline);
         }
 
         if (!empty($jumpTargets)) {
@@ -146,18 +146,18 @@ class Compiler
         $this->emitLine('}');
     }
 
-    private function findJumpTargets(OpcodeArray $oparray): array {
+    private function findJumpTargets(OplineArray $oparray): array {
         $jumpTargets = [];
         
-        foreach ($oparray as $i => $opcode) {
-            if (substr(OPCODE_NAMES[$opcode->getType()], 0, 8) === 'ZEND_JMP') {
-                $op1 = $opcode->getOperand1();
+        foreach ($oparray as $i => $opline) {
+            if (substr(OPCODE_NAMES[$opline->getType()], 0, 8) === 'ZEND_JMP') {
+                $op1 = $opline->getOperand1();
                 if ($op1 instanceof JumpTargetOperand) {
-                    $jumpTargets[] = $op1->getOpcodeIndex();
+                    $jumpTargets[] = $op1->getOplineIndex();
                 }
-                $op2 = $opcode->getOperand2();
+                $op2 = $opline->getOperand2();
                 if ($op2 instanceof JumpTargetOperand) {
-                    $jumpTargets[] = $op2->getOpcodeIndex();
+                    $jumpTargets[] = $op2->getOplineIndex();
                 }
             }
         }
@@ -165,11 +165,11 @@ class Compiler
         return $jumpTargets;
     }
 
-    private function findUsedVariables(OpcodeArray $oparray): array {
+    private function findUsedVariables(OplineArray $oparray): array {
         $usedVariables = [];
 
-        foreach ($oparray as $opcode) {
-            $result = $opcode->getResult();
+        foreach ($oparray as $opline) {
+            $result = $opline->getResult();
             if ($result instanceof CompiledVariableOperand) {
                 $usedVariables['cv_' . $result->getName()] = $result;
             } else if ($result instanceof VariableOperand) {
@@ -180,11 +180,11 @@ class Compiler
         return array_values($usedVariables);
     }
 
-    private function compileOpcode(Opcode $opcode) {
-        $type = $opcode->getType();
-        $op1 = $opcode->getOperand1();
-        $op2 = $opcode->getOperand2();
-        $result = $opcode->getResult();
+    private function compileOpline(Opline $opline) {
+        $type = $opline->getType();
+        $op1 = $opline->getOperand1();
+        $op2 = $opline->getOperand2();
+        $result = $opline->getResult();
 
         switch ($type) {
             case ZEND_NOP:
@@ -336,13 +336,13 @@ class Compiler
                 $this->emitLineEnd(';');
                 break;
             default:
-                throw new \Exception("Can't handle opcode " . OPCODE_NAMES[$opcode->getType()]);
+                throw new \Exception("Can't handle opcode " . OPCODE_NAMES[$opline->getType()]);
                 break;
         }
     }
 
     private function compileJump(JumpTargetOperand $op) {
-        $this->emitLine('jump = ' . $op->getOpcodeIndex() . ';');
+        $this->emitLine('jump = ' . $op->getOplineIndex() . ';');
         $this->emitLine('continue goto_emulation;');
     }
 
