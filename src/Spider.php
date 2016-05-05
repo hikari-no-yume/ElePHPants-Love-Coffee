@@ -23,16 +23,16 @@ class Spider
     }
 
     private function spiderFunction(OpcodeArray $oparray) {
+        $this->functions[$oparray->getName()] = $oparray;
         foreach ($oparray as $opcode) {
             if ($opcode->getType() === ZEND_INIT_FCALL) {
                 $functionName = $opcode->getOperand2()->getValue();
-                if (!isset(PHP_FUNCTIONS[$functionName])) {
+                if (!isset(PHP_FUNCTIONS[$functionName]) && !isset($this->functions[$functionName])) {
                     $function = $this->getFunction($functionName);
                     $this->spiderFunction($function);
                 }
             }
         }
-        $this->functions[$oparray->getName()] = $oparray;
     }
 
     public function spiderFile(): array {
