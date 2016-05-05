@@ -10,7 +10,7 @@ You need a PHP 7 build, first off. The opcodes this deals with are the Zend Engi
 
 You need both PHP 7's CLI sapi (your usual `php` command), and also `phpdbg`, which ElePHPants Love Coffee uses to read opcodes.
 
-Install dependencies from npm with `npm install`.
+Install dependencies from Composer with `composer install`.
 
 Usage
 -----
