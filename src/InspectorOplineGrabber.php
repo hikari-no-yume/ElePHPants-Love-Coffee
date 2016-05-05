@@ -15,7 +15,7 @@ class InspectorOplineGrabber implements OplineGrabber
      */
     public function compileFile(string $filePath): OplineArray {
         if (!isset($this->seenFiles[$filePath])) {
-            $file = new Inspector\File($filePath);
+            $file = new Inspector\File($filePath, /* clobber: */ true);
 
             $this->seenFiles[$filePath] = self::transmogrifyOpcodes($file, "(null)", $filePath);
         }
