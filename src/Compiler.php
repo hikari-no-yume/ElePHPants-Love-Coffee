@@ -238,6 +238,7 @@ class Compiler
                 break;
             case ZEND_DO_FCALL:
             case ZEND_DO_ICALL:
+            case ZEND_DO_UCALL:
                 if ($op1 !== NULL || $op2 !== NULL) {
                     throw new \Exception("Can't handle non-NULL op1 and op2 for ZEND_DO_FCALL");
                 }
