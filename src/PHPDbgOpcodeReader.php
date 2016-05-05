@@ -27,8 +27,6 @@ class PHPDbgOpcodeReader implements OpcodeReader
         
         self::checkInternal($lines);
 
-        var_dump($lines);
-
         $opcodes = self::parseOpcodes($lines);
 
         return $opcodes;
