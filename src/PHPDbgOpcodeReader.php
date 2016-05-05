@@ -90,9 +90,9 @@ class PHPDbgOpcodeReader implements OpcodeReader
                 if ($operandString === "<unused>") {
                     return null;
                 } else if ($operandString[0] === "@") {
-                    return new CompiledVariableOperand(to_int(substr($operandString, 1)));
+                    return new VariableOperand(to_int(substr($operandString, 1)));
                 } else if ($operandString[0] === "$") {
-                    return new VariableOperand(substr($operandString, 1));
+                    return new CompiledVariableOperand(substr($operandString, 1));
                 } else if ($operandString[0] === "J") {
                     return new JumpTargetOperand(to_int(substr($operandString, 1)));
                 } else {

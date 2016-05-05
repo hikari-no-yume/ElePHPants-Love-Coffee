@@ -5,13 +5,13 @@ namespace ajf\ElePHPants_Love_Coffee;
 
 class VariableOperand extends Operand
 {
-    private $name;
+    private $number;
 
-    public function __construct(string $name) {
-        $this->name = $name;
+    public function __construct(int $number) {
+        $this->number = $number;
     }
 
-    public function getName(): string {
-        return $this->name;
+    public function getNumber(): int {
+        return $this->number;
     }
 }

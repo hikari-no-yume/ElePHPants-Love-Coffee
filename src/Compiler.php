@@ -171,9 +171,9 @@ class Compiler
         foreach ($oparray as $opcode) {
             $result = $opcode->getResult();
             if ($result instanceof CompiledVariableOperand) {
-                $usedVariables['cv_' . $result->getNumber()] = $result;
+                $usedVariables['cv_' . $result->getName()] = $result;
             } else if ($result instanceof VariableOperand) {
-                $usedVariables['var_' . $result->getName()] = $result;
+                $usedVariables['var_' . $result->getNumber()] = $result;
             }
         }
 
@@ -349,10 +349,10 @@ class Compiler
         $this->emitLineBegin('var ');
         switch (TRUE) {
             case $op instanceof CompiledVariableOperand:
-                $this->emit('cv_' . $op->getNumber());
+                $this->emit('cv_' . $op->getName());
                 break;
             case $op instanceof VariableOperand:
-                $this->emit('var_' . $op->getName());
+                $this->emit('var_' . $op->getNumber());
                 break;
             default:
                 throw new \Exception("Can't handle variable declaration of operand of type " . get_class($op));
@@ -364,10 +364,10 @@ class Compiler
     private function compileOperandAsLvalue(Operand $op) {
         switch (TRUE) {
             case $op instanceof CompiledVariableOperand:
-                $this->emit('cv_' . $op->getNumber());
+                $this->emit('cv_' . $op->getName());
                 break;
             case $op instanceof VariableOperand:
-                $this->emit('var_' . $op->getName());
+                $this->emit('var_' . $op->getNumber());
                 break;
             default:
                 throw new \Exception("Can't handle lvalue operand of type " . get_class($op));
@@ -381,10 +381,10 @@ class Compiler
                 $this->compileZval($op->getValue());
                 break;
             case $op instanceof CompiledVariableOperand:
-                $this->emit('cv_' . $op->getNumber());
+                $this->emit('cv_' . $op->getName());
                 break;
             case $op instanceof VariableOperand:
-                $this->emit('var_' . $op->getName());
+                $this->emit('var_' . $op->getNumber());
                 break;
             default:
                 throw new \Exception("Can't handle rvalue operand of type " . get_class($op));
