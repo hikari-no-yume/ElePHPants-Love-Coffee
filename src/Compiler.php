@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace ajf\ElePHPants_Love_Coffee;
 
+use ajf\ElePHPants_Love_Coffee\DataStructures\Stack as Stack;
+
 class Compiler
 {
     private $functions;
@@ -11,10 +13,13 @@ class Compiler
     private $output;
     private $indentLevel;
     private $requiredZendFunctions;
+    private $fcallInfoStack;
 
     public function __construct(array $functions, string $entryPoint) {
         $this->functions = $functions;
         $this->entryPoint = $entryPoint;
+
+        $this->fcallInfoStack = new Stack;
     }
 
     public function compile() {
@@ -107,10 +112,6 @@ class Compiler
         foreach ($usedVariables as $operand) {
             $this->compileOperandAsDeclaration($operand);
         }
-
-        // stacks for ZEND_INIT_FCALL/SEND_VAL/DO_FCALL
-        $this->emitLine('var fcallTargetStack = [];');
-        $this->emitLine('var fcallArgumentStack = [];');
 
         // switch() for goto emulation
         if (!empty($jumpTargets)) {
@@ -222,8 +223,12 @@ class Compiler
                     throw new \Exception("Can't find any function by the name '$functionName'");
                 }
 
-                $this->emitLine('fcallTargetStack.push(' . $jsFunctionName . ');');
-                $this->emitLine('fcallArgumentStack.push([]);');
+                $fcallNumber = $this->fcallInfoStack->height();
+                $this->emitLine('var fcall' . $fcallNumber . 'Target = ' . $jsFunctionName . ';');
+                $this->fcallInfoStack->push([
+                    'number' => $fcallNumber,
+                    'argumentCount' => 0
+                ]);
                 $this->isFirst = TRUE;
                 break;
             case ZEND_SEND_VAL:
@@ -232,9 +237,12 @@ class Compiler
                 if ($op2 !== NULL || $result !== NULL) {
                     throw new \Exception("Can't handle non-NULL op2 and result for ZEND_SEND_VAL");
                 }
-                $this->emitLineBegin('fcallArgumentStack[fcallArgumentStack.length - 1].push(');
+                $fcallInfo = $this->fcallInfoStack->pop();
+                $this->emitLineBegin('var fcall' . $fcallInfo['number'] . 'Argument' . $fcallInfo['argumentCount'] . ' = ');
                 $this->compileOperandAsRvalue($op1);
-                $this->emitLineEnd(');');
+                $this->emitLineEnd(';');
+                $fcallInfo['argumentCount']++;
+                $this->fcallInfoStack->push($fcallInfo);
                 break;
             case ZEND_DO_FCALL:
             case ZEND_DO_ICALL:
@@ -242,9 +250,17 @@ class Compiler
                 if ($op1 !== NULL || $op2 !== NULL) {
                     throw new \Exception("Can't handle non-NULL op1 and op2 for ZEND_DO_FCALL");
                 }
+                $fcallInfo = $this->fcallInfoStack->pop();
                 $this->emitLineBegin();
                 $this->compileOperandAsLvalue($result);
-                $this->emitLineEnd(' = fcallTargetStack.pop().apply(null, fcallArgumentStack.pop());');
+                $this->emit(' = fcall' . $fcallInfo['number'] . 'Target(');
+                for ($i = 0; $i < $fcallInfo['argumentCount']; $i++) {
+                    if ($i !== 0) {
+                        $this->emit(', ');
+                    }
+                    $this->emit('fcall' . $fcallInfo['number'] . 'Argument' . $i);
+                }
+                $this->emitLineEnd(');');
                 break;
             case ZEND_RECV:
                 if ($op1 !== NULL || $op2 !== NULL) {
