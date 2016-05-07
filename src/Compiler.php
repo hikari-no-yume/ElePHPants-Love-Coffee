@@ -14,6 +14,7 @@ class Compiler
     private $indentLevel;
     private $requiredZendFunctions;
     private $fcallInfoStack;
+    private $argumentCount;
 
     public function __construct(array $functions, string $entryPoint) {
         $this->functions = $functions;
@@ -112,6 +113,7 @@ class Compiler
         }
 
         $this->fcallInfoStack = new Stack;
+        $this->argumentCount = 0;
 
         // switch() for goto emulation
         if (!empty($jumpTargets)) {
@@ -268,8 +270,8 @@ class Compiler
                 }
                 $this->emitLineBegin();
                 $this->compileOperandAsLvalue($result);
-                $this->emitLineEnd(' = arguments[arguments.i = arguments.i || 0];');
-                $this->emitLine('arguments.i++;');
+                $this->emitLineEnd(' = arguments[' . $this->argumentCount . '];');
+                $this->argumentCount++;
                 break;
             case ZEND_IS_SMALLER:
                 $this->requireZendFunction('zend_compare_function');
