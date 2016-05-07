@@ -8,6 +8,7 @@ const JS_INT_MAX = 0x7FFFFFFF;
 const JS_INT_MIN = -0x80000000;
 
 // from: Zend/zend_vm_opcodes.c:24
+// as of 2016-05-07, PHP-7.0, https://github.com/php/php-src/blob/29079f263e38ebf76e2ddbd308e001639eb9e3bf/Zend/zend_vm_opcodes.c#L24
 const OPCODE_NAMES = [
     "ZEND_NOP",
     "ZEND_ADD",
@@ -109,7 +110,7 @@ const OPCODE_NAMES = [
     "ZEND_FETCH_OBJ_UNSET",
     "ZEND_FETCH_LIST",
     "ZEND_FETCH_CONSTANT",
-    "ZEND_GOTO",
+    NULL,
     "ZEND_EXT_STMT",
     "ZEND_EXT_FCALL_BEGIN",
     "ZEND_EXT_FCALL_END",
@@ -181,7 +182,7 @@ const OPCODE_NAMES = [
     "ZEND_COALESCE",
     "ZEND_SPACESHIP",
     "ZEND_DECLARE_ANON_CLASS",
-    "ZEND_DECLARE_ANON_INHERITED_CLASS"
+    "ZEND_DECLARE_ANON_INHERITED_CLASS",
 ];
 
 foreach (OPCODE_NAMES as $number => $name) {
