@@ -18,8 +18,6 @@ class Compiler
     public function __construct(array $functions, string $entryPoint) {
         $this->functions = $functions;
         $this->entryPoint = $entryPoint;
-
-        $this->fcallInfoStack = new Stack;
     }
 
     public function compile() {
@@ -112,6 +110,8 @@ class Compiler
         foreach ($usedVariables as $operand) {
             $this->compileOperandAsDeclaration($operand);
         }
+
+        $this->fcallInfoStack = new Stack;
 
         // switch() for goto emulation
         if (!empty($jumpTargets)) {
