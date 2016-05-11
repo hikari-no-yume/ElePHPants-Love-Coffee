@@ -275,10 +275,10 @@ class Compiler
                 break;
             case ZEND_IS_SMALLER:
                 $this->requireZendFunction('zend_compare_function');
-
-                $this->emitLineBegin('zend_compare_function(');
-                $this->compileOperandAsRvalue($result);
-                $this->emit(', ');
+                
+                $this->emitLineBegin();
+                $this->compileOperandAsLvalue($result);
+                $this->emit(' = zend_compare_function(');
                 $this->compileOperandAsRvalue($op1);
                 $this->emit(', ');
                 $this->compileOperandAsRvalue($op2);
@@ -293,9 +293,9 @@ class Compiler
             case ZEND_SUB:
                 $this->requireZendFunction('zend_sub_function');
 
-                $this->emitLineBegin('zend_sub_function(');
-                $this->compileOperandAsRvalue($result);
-                $this->emit(', ');
+                $this->emitLineBegin();
+                $this->compileOperandAsLvalue($result);
+                $this->emit(' = zend_sub_function(');
                 $this->compileOperandAsRvalue($op1);
                 $this->emit(', ');
                 $this->compileOperandAsRvalue($op2);
@@ -304,9 +304,9 @@ class Compiler
             case ZEND_MUL:
                 $this->requireZendFunction('zend_mul_function');
 
-                $this->emitLineBegin('zend_mul_function(');
-                $this->compileOperandAsRvalue($result);
-                $this->emit(', ');
+                $this->emitLineBegin();
+                $this->compileOperandAsLvalue($result);
+                $this->emit(' = zend_mul_function(');
                 $this->compileOperandAsRvalue($op1);
                 $this->emit(', ');
                 $this->compileOperandAsRvalue($op2);

@@ -14,7 +14,7 @@ namespace ajf\ElePHPants_Love_Coffee;
 const ZEND_FUNCTIONS = [
     'zend_compare_function' => [
         'require' => [],
-        'source' => 'function zend_compare_function(result, op1, op2) {
+        'source' => 'function zend_compare_function(op1, op2) {
     if (!((op1.type === ' . IS_LONG . ' || op1.type === ' . IS_DOUBLE . ')
         && (op2.type === ' . IS_LONG . ' || op2.type === ' . IS_DOUBLE . '))) {
         throw new Error("Can\'t handle non-IS_LONG/IS_DOUBLE op1 and op2");
@@ -22,13 +22,12 @@ const ZEND_FUNCTIONS = [
 
     var diff = ((op1.type === ' . IS_LONG . ') ? op1.lval : op1.dval)
                - ((op2.type === ' . IS_LONG . ') ? op2.lval : op2.dval);
-    result.type = ' . IS_LONG . ';
-    result.lval = (diff > 0) ? 1 : (diff < 0) ? -1 : 0;
+    return {type: ' . IS_LONG . ', lval: (diff > 0) ? 1 : (diff < 0) ? -1 : 0};
 }'
     ],
     'zend_sub_function' => [
         'require' => [],
-        'source' => 'function zend_sub_function(result, op1, op2) {
+        'source' => 'function zend_sub_function(op1, op2) {
     if (!((op1.type === ' . IS_LONG . ' || op1.type === ' . IS_DOUBLE . ')
         && (op2.type === ' . IS_LONG . ' || op2.type === ' . IS_DOUBLE . '))) {
         throw new Error("Can\'t handle non-IS_LONG/IS_DOUBLE op1 and op2");
@@ -37,17 +36,15 @@ const ZEND_FUNCTIONS = [
     var resval = ((op1.type === ' . IS_LONG . ') ? op1.lval : op1.dval)
                - ((op2.type === ' . IS_LONG . ') ? op2.lval : op2.dval);
     if (op1.type === ' . IS_LONG . ' && op2.type === ' . IS_LONG . ' && (resval | 0) === resval) {
-        result.type = ' . IS_LONG . ';
-        result.lval = resval;
+        return {type: ' . IS_LONG . ', lval: resval};
     } else {
-        result.type = ' . IS_DOUBLE . ';
-        result.dval = resval;
+        return {type: ' . IS_DOUBLE . ', dval: resval};
     }
 }'
     ],
     'zend_mul_function' => [
         'require' => [],
-        'source' => 'function zend_mul_function(result, op1, op2) {
+        'source' => 'function zend_mul_function(op1, op2) {
     if (!((op1.type === ' . IS_LONG . ' || op1.type === ' . IS_DOUBLE . ')
         && (op2.type === ' . IS_LONG . ' || op2.type === ' . IS_DOUBLE . '))) {
         throw new Error("Can\'t handle non-IS_LONG/IS_DOUBLE op1 and op2");
@@ -56,11 +53,9 @@ const ZEND_FUNCTIONS = [
     var resval = ((op1.type === ' . IS_LONG . ') ? op1.lval : op1.dval)
                * ((op2.type === ' . IS_LONG . ') ? op2.lval : op2.dval);
     if (op1.type === ' . IS_LONG . ' && op2.type === ' . IS_LONG . ' && (resval | 0) === resval) {
-        result.type = ' . IS_LONG . ';
-        result.lval = resval;
+        return {type: ' . IS_LONG . ', lval: resval};
     } else {
-        result.type = ' . IS_DOUBLE . ';
-        result.dval = resval;
+        return {type: ' . IS_DOUBLE . ', dval: resval};
     }
 }'
     ],
