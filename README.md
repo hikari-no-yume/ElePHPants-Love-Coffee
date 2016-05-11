@@ -8,18 +8,16 @@ Requirements
 
 You need a PHP 7 build, first off. The opcodes this deals with are the Zend Engine III's, not ZE2 or ZE1. Also, the compiler itself uses PHP 7-specific features.
 
-You'll also need either Joe Watkins's [Inspector extension](https://github.com/krakjoe/inspector), or `phpdbg`, so that ElePHPants Love Coffee can get at the opcodes produced by the PHP compiler. The `phpdbg` backend is a hack, don't use it if you don't have to.
+You'll also need either Joe Watkins's [Inspector extension](https://github.com/krakjoe/inspector), so that ElePHPants Love Coffee can get at the opcodes produced by the PHP compiler.
 
 All other dependencies can be gotten from from Composer with `composer install`.
 
 Usage
 -----
 
-    $ php src/main.php -inspector my_php_file.php
+    $ php src/main.php my_php_file.php
 
 This uses the Inspector extension to dump the opcodes of `my_php_file.php`, attempts to compile them, and spits out JavaScript to standard output.
-
-(To use `phpdbg`, replace `-inspector` with `-phpdbg path/to/phpdbg`.)
 
 Want some code to try out? Here:
 
