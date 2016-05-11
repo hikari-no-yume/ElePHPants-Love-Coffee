@@ -108,10 +108,8 @@ JS
         'require' => ['zend_long', 'zend_double'],
         'source' => <<<'JS'
 function php_var_dump_inner(value) {
-    if (value === false) {
-        console.log("bool(false)");
-    } else if (value === true) {
-        console.log("bool(true)");
+    if (typeof value === "boolean") {
+        console.log("bool(" + value + ")");
     } else if (value === null) {
         console.log("NULL");
     } else if (value instanceof zend_long) {
