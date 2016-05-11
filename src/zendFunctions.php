@@ -34,7 +34,7 @@ JS
 function zend_compare_function(op1, op2) {
     if (!((op1 instanceof zend_long || op1 instanceof zend_double)
         && (op2 instanceof zend_long || op2 instanceof zend_double))) {
-        throw new Error("Can\'t handle non-IS_LONG/IS_DOUBLE op1 and op2");
+        throw new Error("Can't handle non-IS_LONG/IS_DOUBLE op1 and op2");
     }
 
     var diff = op1.val - op2.val;
@@ -48,7 +48,7 @@ JS
 function zend_sub_function(op1, op2) {
     if (!((op1 instanceof zend_long || op1 instanceof zend_double)
         && (op2 instanceof zend_long || op2 instanceof zend_double))) {
-        throw new Error("Can\'t handle non-IS_LONG/IS_DOUBLE op1 and op2");
+        throw new Error("Can't handle non-IS_LONG/IS_DOUBLE op1 and op2");
     }
 
     var resval = op1.val - op2.val;
@@ -66,7 +66,7 @@ JS
 function zend_mul_function(op1, op2) {
     if (!((op1 instanceof zend_long || op1 instanceof zend_double)
         && (op2 instanceof zend_long || op2 instanceof zend_double))) {
-        throw new Error("Can\'t handle non-IS_LONG/IS_DOUBLE op1 and op2");
+        throw new Error("Can't handle non-IS_LONG/IS_DOUBLE op1 and op2");
     }
 
     var resval = op1.val * op2.val;
@@ -87,7 +87,7 @@ function zend_is_true(op) {
     } else if (op instanceof zend_long || op instanceof zend_double) {
         return !!op.val;
     } else {
-        throw new Error("Can\'t handle non-IS_UNDEF/IS_NULL/IS_FALSE/IS_TRUE/IS_LONG/IS_DOUBLE op");
+        throw new Error("Can't handle non-IS_UNDEF/IS_NULL/IS_FALSE/IS_TRUE/IS_LONG/IS_DOUBLE op");
     }
 }
 JS
@@ -123,7 +123,7 @@ function php_var_dump_inner(value) {
             console.log("float(" + value.val + ")");
         }
     } else {
-        throw new Error("Can\'t handle non-IS_NULL/IS_FALSE/IS_TRUE/IS_LONG/IS_DOUBLE op");
+        throw new Error("Can't handle non-IS_NULL/IS_FALSE/IS_TRUE/IS_LONG/IS_DOUBLE op");
     }
 }
 JS
