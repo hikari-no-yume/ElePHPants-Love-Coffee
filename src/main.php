@@ -5,13 +5,20 @@ namespace ajf\ElePHPants_Love_Coffee;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-if ($argc !== 2) {
+if ($argc === 2) {
+    $infile = $argv[1];
+    $dump = false;
+} else if ($argc === 3 && $argv[1] === "-dump") {
+    $infile = $argv[2];
+    $dump = true;
+} else {
     echo "Usage:", PHP_EOL;
-    echo "    main.php <infile>", PHP_EOL;
+    echo "    Compile to JS:", PHP_EOL;
+    echo "        main.php <infile>", PHP_EOL;
+    echo "    Dump opcodes:", PHP_EOL;
+    echo "        main.php -dump <infile>", PHP_EOL;
     die();
 }
-
-$infile = $argv[1];
 
 $grabber = new InspectorOplineGrabber;
 
@@ -19,6 +26,12 @@ $spider = new Spider($grabber, $infile);
 
 $functions = $spider->spiderFile();
 
-$compiler = new Compiler($functions, "(null)");
+if ($dump) {
+    foreach ($functions as $function) {
+        echo $function, PHP_EOL;
+    }
+} else {
+    $compiler = new Compiler($functions, "(null)");
 
-echo $compiler->compile();
+    echo $compiler->compile();
+}
