@@ -288,7 +288,7 @@ class Compiler
                 $this->compileOperandAsLvalue($result);
                 $this->emit(' = { type: (');
                 $this->compileOperandAsRvalue($result);
-                $this->emitLineEnd('.lval < 0) ? ' . IS_TRUE . ' : ' . IS_FALSE . ' };');
+                $this->emitLineEnd('.val < 0) ? ' . IS_TRUE . ' : ' . IS_FALSE . ' };');
                 break;
             case ZEND_SUB:
                 $this->requireZendFunction('zend_sub_function');
@@ -426,11 +426,11 @@ class Compiler
                 break;
             case "integer":
                 $this->emit((string)IS_LONG . ', ');
-                $this->emit('lval: ' . (string)$value);
+                $this->emit('val: ' . (string)$value);
                 break;
             case "double":
                 $this->emit((string)IS_DOUBLE . ', ');
-                $this->emit('dval: ');
+                $this->emit('val: ');
                 if ($value === INF) {
                     $this->emit('Infinity');
                 } else if ($value === -INF) {

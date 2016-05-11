@@ -20,9 +20,8 @@ const ZEND_FUNCTIONS = [
         throw new Error("Can\'t handle non-IS_LONG/IS_DOUBLE op1 and op2");
     }
 
-    var diff = ((op1.type === ' . IS_LONG . ') ? op1.lval : op1.dval)
-               - ((op2.type === ' . IS_LONG . ') ? op2.lval : op2.dval);
-    return {type: ' . IS_LONG . ', lval: (diff > 0) ? 1 : (diff < 0) ? -1 : 0};
+    var diff = op1.val - op2.val;
+    return {type: ' . IS_LONG . ', val: (diff > 0) ? 1 : (diff < 0) ? -1 : 0};
 }'
     ],
     'zend_sub_function' => [
@@ -33,13 +32,11 @@ const ZEND_FUNCTIONS = [
         throw new Error("Can\'t handle non-IS_LONG/IS_DOUBLE op1 and op2");
     }
 
-    var resval = ((op1.type === ' . IS_LONG . ') ? op1.lval : op1.dval)
-               - ((op2.type === ' . IS_LONG . ') ? op2.lval : op2.dval);
-    if (op1.type === ' . IS_LONG . ' && op2.type === ' . IS_LONG . ' && (resval | 0) === resval) {
-        return {type: ' . IS_LONG . ', lval: resval};
-    } else {
-        return {type: ' . IS_DOUBLE . ', dval: resval};
-    }
+    var resval = op1.val - op2.val;
+    return {
+        type: (op1.type === ' . IS_LONG . ' && op2.type === ' . IS_LONG . ' && (resval | 0) === resval) ? ' . IS_LONG . ' : ' . IS_DOUBLE . ',
+        val: resval
+    };
 }'
     ],
     'zend_mul_function' => [
@@ -50,13 +47,11 @@ const ZEND_FUNCTIONS = [
         throw new Error("Can\'t handle non-IS_LONG/IS_DOUBLE op1 and op2");
     }
 
-    var resval = ((op1.type === ' . IS_LONG . ') ? op1.lval : op1.dval)
-               * ((op2.type === ' . IS_LONG . ') ? op2.lval : op2.dval);
-    if (op1.type === ' . IS_LONG . ' && op2.type === ' . IS_LONG . ' && (resval | 0) === resval) {
-        return {type: ' . IS_LONG . ', lval: resval};
-    } else {
-        return {type: ' . IS_DOUBLE . ', dval: resval};
-    }
+    var resval = op1.val * op2.val;
+    return {
+        type: (op1.type === ' . IS_LONG . ' && op2.type === ' . IS_LONG . ' && (resval | 0) === resval) ? ' . IS_LONG . ' : ' . IS_DOUBLE . ',
+        val: resval
+    };
 }'
     ],
     'zend_is_true' => [
@@ -70,9 +65,8 @@ const ZEND_FUNCTIONS = [
         case ' . IS_TRUE . ':
             return true;
         case ' . IS_LONG . ':
-            return !!op.lval;
         case ' . IS_DOUBLE . ':
-            return !!op.dval;
+            return !!op.val;
         default:
             throw new Error("Can\'t handle non-IS_UNDEF/IS_NULL/IS_FALSE/IS_TRUE/IS_LONG/IS_DOUBLE op");
     }
@@ -102,15 +96,15 @@ const ZEND_FUNCTIONS = [
             console.log("NULL");
             break;
         case ' . IS_LONG . ':
-            console.log("int(" + value.lval + ")");
+            console.log("int(" + value.val + ")");
             break;
         case ' . IS_DOUBLE . ':
-            if (!Number.isFinite(value.dval)) {
-                console.log("float(" + (value.dval < 0 ? "-" : "") + "INF)");
-            } else if (Number.isNaN(value.dval)) {
+            if (!Number.isFinite(value.val)) {
+                console.log("float(" + (value.val < 0 ? "-" : "") + "INF)");
+            } else if (Number.isNaN(value.val)) {
                 console.log("float(NAN)");
             } else {
-                console.log("float(" + value.dval + ")");
+                console.log("float(" + value.val + ")");
             }
             break;
         default:
