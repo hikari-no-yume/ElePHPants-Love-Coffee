@@ -5,7 +5,9 @@ namespace ajf\ElePHPants_Love_Coffee;
 
 // These are library functions for our generated JS code
 // zend_ ones roughly map to functions used in the Zend Engine III's source code
+// They are used to implement operators, for example.
 // php_ ones are implementations of PHP standard library functions
+// These are PHP functions like var_dump() or strlen().
 // Each entry has two keys:
 // 'require' - an array listing the names of functions this function depends on
 // 'source' - the JavaScript source code of the function itself
