@@ -12,63 +12,71 @@ namespace ajf\ElePHPants_Love_Coffee;
 // 'require' - an array listing the names of functions this function depends on
 // 'source' - the JavaScript source code of the function itself
 const ZEND_FUNCTIONS = [
-    'zend_compare_function' => [
+    'zend_long' => [
         'require' => [],
+        'source' => 'function zend_long(lval) {
+    this.val = lval;
+}'
+    ],
+    'zend_double' => [
+        'require' => [],
+        'source' => 'function zend_double(dval) {
+    this.val = dval;
+}'
+    ],
+    'zend_compare_function' => [
+        'require' => ['zend_long', 'zend_double'],
         'source' => 'function zend_compare_function(op1, op2) {
-    if (!((op1.type === ' . IS_LONG . ' || op1.type === ' . IS_DOUBLE . ')
-        && (op2.type === ' . IS_LONG . ' || op2.type === ' . IS_DOUBLE . '))) {
+    if (!((op1 instanceof zend_long || op1 instanceof zend_double)
+        && (op2 instanceof zend_long || op2 instanceof zend_double))) {
         throw new Error("Can\'t handle non-IS_LONG/IS_DOUBLE op1 and op2");
     }
 
     var diff = op1.val - op2.val;
-    return {type: ' . IS_LONG . ', val: (diff > 0) ? 1 : (diff < 0) ? -1 : 0};
+    return new zend_long((diff > 0) ? 1 : (diff < 0) ? -1 : 0);
 }'
     ],
     'zend_sub_function' => [
-        'require' => [],
+        'require' => ['zend_long', 'zend_double'],
         'source' => 'function zend_sub_function(op1, op2) {
-    if (!((op1.type === ' . IS_LONG . ' || op1.type === ' . IS_DOUBLE . ')
-        && (op2.type === ' . IS_LONG . ' || op2.type === ' . IS_DOUBLE . '))) {
+    if (!((op1 instanceof zend_long || op1 instanceof zend_double)
+        && (op2 instanceof zend_long || op2 instanceof zend_double))) {
         throw new Error("Can\'t handle non-IS_LONG/IS_DOUBLE op1 and op2");
     }
 
     var resval = op1.val - op2.val;
-    return {
-        type: (op1.type === ' . IS_LONG . ' && op2.type === ' . IS_LONG . ' && (resval | 0) === resval) ? ' . IS_LONG . ' : ' . IS_DOUBLE . ',
-        val: resval
-    };
+    if (op1 instanceof zend_long && op2 instanceof zend_long && (resval | 0) === resval) {
+        return new zend_long(resval);
+    } else {
+        return new zend_double(resval);
+    }
 }'
     ],
     'zend_mul_function' => [
-        'require' => [],
+        'require' => ['zend_long', 'zend_double'],
         'source' => 'function zend_mul_function(op1, op2) {
-    if (!((op1.type === ' . IS_LONG . ' || op1.type === ' . IS_DOUBLE . ')
-        && (op2.type === ' . IS_LONG . ' || op2.type === ' . IS_DOUBLE . '))) {
+    if (!((op1 instanceof zend_long || op1 instanceof zend_double)
+        && (op2 instanceof zend_long || op2 instanceof zend_double))) {
         throw new Error("Can\'t handle non-IS_LONG/IS_DOUBLE op1 and op2");
     }
 
     var resval = op1.val * op2.val;
-    return {
-        type: (op1.type === ' . IS_LONG . ' && op2.type === ' . IS_LONG . ' && (resval | 0) === resval) ? ' . IS_LONG . ' : ' . IS_DOUBLE . ',
-        val: resval
-    };
+    if (op1 instanceof zend_long && op2 instanceof zend_long && (resval | 0) === resval) {
+        return new zend_long(resval);
+    } else {
+        return new zend_double(resval);
+    }
 }'
     ],
     'zend_is_true' => [
-        'require' => [],
+        'require' => ['zend_long', 'zend_double'],
         'source' => 'function zend_is_true(op) {
-    switch(op.type) {
-        case ' . IS_UNDEF . ':
-        case ' . IS_NULL . ':
-        case ' . IS_FALSE . ':
-            return false;
-        case ' . IS_TRUE . ':
-            return true;
-        case ' . IS_LONG . ':
-        case ' . IS_DOUBLE . ':
-            return !!op.val;
-        default:
-            throw new Error("Can\'t handle non-IS_UNDEF/IS_NULL/IS_FALSE/IS_TRUE/IS_LONG/IS_DOUBLE op");
+    if (op === undefined || op === null || op === false || op === true) {
+        return !!op;
+    } else if (op instanceof zend_long || op instanceof zend_double) {
+        return !!op.val;
+    } else {
+        throw new Error("Can\'t handle non-IS_UNDEF/IS_NULL/IS_FALSE/IS_TRUE/IS_LONG/IS_DOUBLE op");
     }
 }'
     ],
@@ -83,32 +91,26 @@ const ZEND_FUNCTIONS = [
 }'
     ],
     'php_var_dump_inner' => [
-        'require' => [],
+        'require' => ['zend_long', 'zend_double'],
         'source' => 'function php_var_dump_inner(value) {
-    switch(value.type) {
-        case ' . IS_FALSE . ':
-            console.log("bool(false)");
-            break;
-        case ' . IS_TRUE . ':
-            console.log("bool(true)");
-            break;
-        case ' . IS_NULL . ':
-            console.log("NULL");
-            break;
-        case ' . IS_LONG . ':
-            console.log("int(" + value.val + ")");
-            break;
-        case ' . IS_DOUBLE . ':
-            if (!Number.isFinite(value.val)) {
-                console.log("float(" + (value.val < 0 ? "-" : "") + "INF)");
-            } else if (Number.isNaN(value.val)) {
-                console.log("float(NAN)");
-            } else {
-                console.log("float(" + value.val + ")");
-            }
-            break;
-        default:
-            throw new Error("Can\'t handle non-IS_NULL/IS_FALSE/IS_TRUE/IS_LONG/IS_DOUBLE op");
+    if (value === false) {
+        console.log("bool(false)");
+    } else if (value === true) {
+        console.log("bool(true)");
+    } else if (value === null) {
+        console.log("NULL");
+    } else if (value instanceof zend_long) {
+        console.log("int(" + value.val + ")");
+    } else if (value instanceof zend_double) {
+        if (!Number.isFinite(value.val)) {
+            console.log("float(" + (value.val < 0 ? "-" : "") + "INF)");
+        } else if (Number.isNaN(value.val)) {
+            console.log("float(NAN)");
+        } else {
+            console.log("float(" + value.val + ")");
+        }
+    } else {
+        throw new Error("Can\'t handle non-IS_NULL/IS_FALSE/IS_TRUE/IS_LONG/IS_DOUBLE op");
     }
 }'
     ],

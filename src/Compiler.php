@@ -286,9 +286,9 @@ class Compiler
 
                 $this->emitLineBegin();
                 $this->compileOperandAsLvalue($result);
-                $this->emit(' = { type: (');
+                $this->emit(' = (');
                 $this->compileOperandAsRvalue($result);
-                $this->emitLineEnd('.val < 0) ? ' . IS_TRUE . ' : ' . IS_FALSE . ' };');
+                $this->emitLineEnd('.val < 0) ? true : false;');
                 break;
             case ZEND_SUB:
                 $this->requireZendFunction('zend_sub_function');
@@ -377,7 +377,7 @@ class Compiler
                 throw new \Exception("Can't handle variable declaration of operand of type " . get_class($op));
                 break;
         }
-        $this->emitLineEnd(' = { type: ' . IS_UNDEF . ' };');
+        $this->emitLineEnd(';');
     }
 
     private function compileOperandAsLvalue(Operand $op) {
@@ -412,25 +412,24 @@ class Compiler
     }
 
     private function compileZval($value) {
-        $this->emit("{ type: ");
         switch (gettype($value)) {
             case "NULL":
-                $this->emit((string)IS_NULL);
+                $this->emit('null');
                 break;
             case "boolean":
                 if ($value) {
-                    $this->emit((string)IS_TRUE);
+                    $this->emit('true');
                 } else {
-                    $this->emit((string)IS_FALSE);
+                    $this->emit('false');
                 }
                 break;
             case "integer":
-                $this->emit((string)IS_LONG . ', ');
-                $this->emit('val: ' . (string)$value);
+                $this->requireZendFunction('zend_long');
+                $this->emit('new zend_long(' . (string)$value . ')');
                 break;
             case "double":
-                $this->emit((string)IS_DOUBLE . ', ');
-                $this->emit('val: ');
+                $this->requireZendFunction('zend_double');
+                $this->emit('new zend_double(');
                 if ($value === INF) {
                     $this->emit('Infinity');
                 } else if ($value === -INF) {
@@ -440,12 +439,12 @@ class Compiler
                 } else {
                     $this->emit(json_encode($value));
                 }
+                $this->emit(')');
                 break;
             default:
                 throw new \Exception("Can't handle literals of type " . gettype($value));
                 break;
         }
-        $this->emit(" }");
     }
 
     private function requireZendFunction(string $name) {
