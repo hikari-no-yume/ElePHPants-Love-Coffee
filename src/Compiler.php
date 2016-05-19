@@ -337,7 +337,7 @@ class Compiler
                 break;
             case ZEND_QM_ASSIGN:
                 if ($op2 !== NULL) {
-                    throw new \Exception("Can't handle non-NULL result for ZEND_QM_ASSIGN");
+                    throw new \Exception("Can't handle non-NULL op2 for ZEND_QM_ASSIGN");
                 }
                 $this->emitLineBegin();
                 $this->compileOperandAsLvalue($result);
