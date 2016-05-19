@@ -183,20 +183,46 @@ class Compiler
         return array_values($usedVariables);
     }
 
+
     private function compileOpline(Opline $opline) {
         $type = $opline->getType();
         $op1 = $opline->getOperand1();
         $op2 = $opline->getOperand2();
         $result = $opline->getResult();
 
+        $assert = function (string $what, string $as) use (&$type, &$op1, &$op2, &$result) /* : void */ {
+            switch ($as) {
+                case "NULL":
+                    $condition = ($$what === NULL);
+                    break;
+                case "literal":
+                    $condition = ($$what instanceof LiteralOperand);
+                    break;
+                case "jump":
+                    $condition = ($$what instanceof JumpTargetOperand);
+                    break;
+                case "cv":
+                    $condition = ($$what instanceof CompiledVariableOperand);
+                    break;
+                case "var":
+                    $condition = ($$what instanceof VariableOperand);
+                    break;
+                default:
+                    throw new \Exception("Incorrect \$type-type, \$type=\"$type\"");
+            }
+            if (!$condition) {
+                throw new \Exception("Can't handle non-$as $what for " . OPCODE_NAMES[$type]);
+            }
+        };
+
         switch ($type) {
             case ZEND_NOP:
                 //$this->emitLine("void(0);");
                 break;
             case ZEND_ECHO:
-                if ($op2 !== NULL || $result !== NULL) {
-                    throw new \Exception("Can't handle non-NULL op2 and result for ZEND_ECHO");
-                }
+                $assert("op2", "NULL");
+                $assert("result", "NULL");
+
                 // TODO: echo properly!
                 $this->emitLineBegin("console.dir(");
                 $this->compileOperandAsRvalue($op1);
@@ -204,12 +230,9 @@ class Compiler
                 break;
             case ZEND_INIT_FCALL:
             case ZEND_INIT_FCALL_BY_NAME:
-                if ($op1 !== NULL || $result !== NULL) {
-                    throw new \Exception("Can't handle non-NULL op1 and result for ZEND_INIT_FCALL");
-                }
-                if (!$op2 instanceof LiteralOperand) {
-                    throw new \Exception("Can't handle non-literal op2 for ZEND_INIT_FCALL");
-                }
+                $assert("op1", "NULL");
+                $assert("op2", "literal");
+                $assert("result", "NULL");
                 $functionName = $op2->getValue();
                 if (!is_string($functionName)) {
                     throw new \Exception("Can't handle non-string op2 for ZEND_INIT_FCALL");
@@ -236,9 +259,9 @@ class Compiler
             case ZEND_SEND_VAL:
             case ZEND_SEND_VAL_EX:
             case ZEND_SEND_VAR:
-                if ($op2 !== NULL || $result !== NULL) {
-                    throw new \Exception("Can't handle non-NULL op2 and result for ZEND_SEND_VAL");
-                }
+                $assert("op2", "NULL");
+                $assert("result", "NULL");
+
                 $fcallInfo = $this->fcallInfoStack->pop();
                 $this->emitLineBegin('var fcall' . $fcallInfo['number'] . 'Argument' . $fcallInfo['argumentCount'] . ' = ');
                 $this->compileOperandAsRvalue($op1);
@@ -249,9 +272,9 @@ class Compiler
             case ZEND_DO_FCALL:
             case ZEND_DO_ICALL:
             case ZEND_DO_UCALL:
-                if ($op1 !== NULL || $op2 !== NULL) {
-                    throw new \Exception("Can't handle non-NULL op1 and op2 for ZEND_DO_FCALL");
-                }
+                $assert("op1", "NULL");
+                $assert("op2", "NULL");
+
                 $fcallInfo = $this->fcallInfoStack->pop();
                 $this->emitLineBegin();
                 $this->compileOperandAsLvalue($result);
@@ -265,9 +288,9 @@ class Compiler
                 $this->emitLineEnd(');');
                 break;
             case ZEND_RECV:
-                if ($op1 !== NULL || $op2 !== NULL) {
-                    throw new \Exception("Can't handle non-NULL op1 and op2 for ZEND_RECV");
-                }
+                $assert("op1", "NULL");
+                $assert("op2", "NULL");
+
                 $this->emitLineBegin();
                 $this->compileOperandAsLvalue($result);
                 $this->emitLineEnd(' = arguments[' . $this->argumentCount . '];');
@@ -313,15 +336,13 @@ class Compiler
                 $this->emitLineEnd(');');
                 break;
             case ZEND_JMP:
-                if ($op2 !== NULL && $result !== NULL) {
-                    throw new \Exception("Can't handle non-NULL op2 and result for ZEND_JMPZ");
-                }
+                $assert("op2", "NULL");
+                $assert("result", "NULL");
+
                 $this->compileJump($op1);
                 break;
             case ZEND_JMPZ:
-                if ($result !== NULL) {
-                    throw new \Exception("Can't handle non-NULL result for ZEND_JMPZ");
-                }
+                $assert("result", "NULL");
                 $this->requireZendFunction('zend_is_true');
 
                 $this->emitLineBegin('if (!zend_is_true(');
@@ -336,9 +357,8 @@ class Compiler
                 $this->emitLine('}');
                 break;
             case ZEND_QM_ASSIGN:
-                if ($op2 !== NULL) {
-                    throw new \Exception("Can't handle non-NULL op2 for ZEND_QM_ASSIGN");
-                }
+                $assert("op2", "NULL");
+
                 $this->emitLineBegin();
                 $this->compileOperandAsLvalue($result);
                 $this->emit(' = ');
@@ -346,9 +366,9 @@ class Compiler
                 $this->emitLineEnd(';');
                 break;
             case ZEND_RETURN:
-                if ($op2 !== NULL && $result !== NULL) {
-                    throw new \Exception("Can't handle non-NULL op2 and result for ZEND_RETURN");
-                }
+                $assert("op2", "NULL");
+                $assert("result", "NULL");
+
                 $this->emitLineBegin('return ');
                 $this->compileOperandAsRvalue($op1);
                 $this->emitLineEnd(';');
