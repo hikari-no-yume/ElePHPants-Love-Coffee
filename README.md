@@ -42,3 +42,80 @@ License
 ElePHPants Love Coffee is licensed under the PHP and Zend licenses except as otherwise noted.
 
 This is to avoid copyright issues with code similarities to the Zend Engine and PHP.
+
+Implementation status
+---------------------
+
+### Tests
+
+There aren't any. That's bad.
+
+We should probably have some unit tests for parts of the compiler, and a bunch of integration tests.
+
+We could also use some of the tests from the PHP language specification or the mainline PHP interpreter.
+
+### Supported types
+
+* null
+* bool (false/true)
+* integer
+* float
+
+### Unsupported types
+
+* string
+* array
+* object
+* resource
+
+### Supported opcodes
+
+* `NOP`
+* `ECHO` (hacky, implicit newline, assumes `console.log`)
+* `INIT_FCALL`, `INIT_FCALL_BY_NAME` (only for global functions known at compile-time)
+* `SEND_VAL`, `SEND_VAL_EX`, `SEND_VAR` (no by-reference support)
+* `DO_FCALL`, `DO_ICALL`, `DO_UCALL` (no optimisation for F/I/U cases, no by-reference support)
+* `RECV` (no by-reference support, no type-checking)
+* `IS_SMALLER` (integer/float operands only)
+* `SUB`, `MUL` (integer/float operands only)
+* `JMP`
+* `JMPZ` (null/bool/integer/float operands only)
+* `QM_ASSIGN` (probably doesn't implement assignment properly)
+* `RETURN` (no by-reference support)
+
+### Unsupported opcodes
+
+Everything else.
+
+Particularly notably, `ASSIGN` is unimplemented, and basic operations are incomplete with no `ASSIGN_`\* versions.
+
+### Supported standard library functions
+
+* `var_dump` (null/bool/integer/float only)
+
+### Unsupported standard library functions
+
+Everything else.
+
+Particularly notably, all math and string functions.
+
+### Other missing features
+
+Pretty much everything, but particularly:
+
+* Compiling multiple files
+* PHP 7.1
+  * Type-specialised opcodes
+* JavaScript interoperability
+  * Interacting with the DOM (whether through FFI or otherwise)
+* Streams
+  * `echo`
+* References
+* Copy-on-write/reference counting (if needed)
+* Type coercion
+* Strict typing
+* Errors (the `trigger_error` kind)
+* Nice error messages
+* Namespaces (a function named `foo\bar` probably won't compile)
+* Classes
+* Reflection
