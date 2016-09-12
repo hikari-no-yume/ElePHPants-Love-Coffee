@@ -36,6 +36,10 @@ class InspectorOplineGrabber implements OplineGrabber
         $oparray = new OplineArray($name, $filePath, $scope->getLineStart(), $scope->getLineEnd());
 
         foreach ($scope as $opline) {
+            if (\is_null($opline->getType())) {
+                continue;
+            }
+
             $operands = array_map([$opline, 'getOperand'], [Inspector\Opline::OP1, Inspector\Opline::OP2, Inspector\Opline::RESULT]);
             $operands = array_map(function (Inspector\Operand $operand) {
                 // Note that jump target operands are marked as IS_UNUSED
