@@ -270,6 +270,7 @@ class Compiler
                 $this->fcallInfoStack->push($fcallInfo);
                 break;
             case ZEND_DO_FCALL:
+            case ZEND_DO_FCALL_BY_NAME:
             case ZEND_DO_ICALL:
             case ZEND_DO_UCALL:
                 $assert("op1", "NULL");

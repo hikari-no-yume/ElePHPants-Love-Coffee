@@ -80,7 +80,7 @@ It probably doesn't work on `PHP-7.1` or `master`.
 * `ECHO` (hacky, implicit newline, assumes `console.log`)
 * `INIT_FCALL`, `INIT_FCALL_BY_NAME` (only for global functions known at compile-time)
 * `SEND_VAL`, `SEND_VAL_EX`, `SEND_VAR` (no by-reference support)
-* `DO_FCALL`, `DO_ICALL`, `DO_UCALL` (no optimisation for F/I/U cases, no by-reference support)
+* `DO_FCALL`, `DO_FCALL_BY_NAME`, `DO_ICALL`, `DO_UCALL` (no optimisation for F/I/U cases, no by-reference support)
 * `RECV` (no by-reference support, no type-checking)
 * `IS_SMALLER` (integer/float operands only)
 * `SUB`, `MUL` (integer/float operands only)
