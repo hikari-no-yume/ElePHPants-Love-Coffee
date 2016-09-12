@@ -54,6 +54,12 @@ We should probably have some unit tests for parts of the compiler, and a bunch o
 
 We could also use some of the tests from the PHP language specification or the mainline PHP interpreter.
 
+### Supported PHP versions
+
+Currently, this is only being tested on PHP builds from the `PHP-7.0` branch, with OPcache enabled and disabled (the former generates different opcodes).
+
+It probably doesn't work on `PHP-7.1` or `master`.
+
 ### Supported types
 
 * null
