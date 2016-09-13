@@ -15,7 +15,7 @@ All other dependencies can be gotten from from Composer with `composer install`.
 Usage
 -----
 
-    $ php main.php my_php_file.php
+    $ php elc.php my_php_file.php
 
 This uses the Inspector extension to dump the opcodes of `my_php_file.php`, attempts to compile them, and spits out JavaScript to standard output.
 
