@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace ajf\ElePHPants_Love_Coffee;
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 if ($argc === 2) {
     $infile = $argv[1];
