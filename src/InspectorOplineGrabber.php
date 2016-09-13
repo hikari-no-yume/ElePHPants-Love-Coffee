@@ -3,6 +3,12 @@ declare(strict_types=1);
 
 namespace ajf\ElePHPants_Love_Coffee;
 
+use ajf\ElePHPants_Love_Coffee\ZendEngine\CompiledVariableOperand;
+use ajf\ElePHPants_Love_Coffee\ZendEngine\JumpTargetOperand;
+use ajf\ElePHPants_Love_Coffee\ZendEngine\LiteralOperand;
+use ajf\ElePHPants_Love_Coffee\ZendEngine\Opline;
+use ajf\ElePHPants_Love_Coffee\ZendEngine\OplineArray;
+use ajf\ElePHPants_Love_Coffee\ZendEngine\VariableOperand;
 use Inspector;
 
 class InspectorOplineGrabber implements OplineGrabber

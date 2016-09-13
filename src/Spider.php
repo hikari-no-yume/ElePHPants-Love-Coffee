@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace ajf\ElePHPants_Love_Coffee;
 
+use ajf\ElePHPants_Love_Coffee\ZendEngine\OplineArray;
+
 class Spider
 {
     private $grabber;
