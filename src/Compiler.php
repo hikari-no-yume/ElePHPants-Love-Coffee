@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace ajf\ElePHPants_Love_Coffee;
 
-use ajf\ElePHPants_Love_Coffee\DataStructures\Stack as Stack;
+use ajf\ElePHPants_Love_Coffee\DataStructures\IntSet;
+use ajf\ElePHPants_Love_Coffee\DataStructures\Stack;
+use ajf\ElePHPants_Love_Coffee\DataStructures\StringSet;
 use ajf\ElePHPants_Love_Coffee\ZendEngine\CompiledVariableOperand;
 use ajf\ElePHPants_Love_Coffee\ZendEngine\JumpTargetOperand;
 use ajf\ElePHPants_Love_Coffee\ZendEngine\LiteralOperand;
@@ -31,9 +33,8 @@ class Compiler
     public function compile() {
         $this->output = '';
         $this->indentLevel = 0;
-        // "set" (really, an array with ignored values)
         // contains names of opcode implementation functions we need in output
-        $this->requiredZendFunctions = [];
+        $this->requiredZendFunctions = new StringSet;
 
         $this->emitPrelude();
 
@@ -108,10 +109,9 @@ class Compiler
         }
         $this->indent();
 
-        // "set" (really, an array with unused values)
         // contains opcodes which are actually jumped to
         // this is so we can avoid emitting unused labels
-        $jumpTargets = array_flip($this->findJumpTargets($oparray));
+        $jumpTargets = $this->findJumpTargets($oparray);
 
         $usedVariables = $this->findUsedVariables($oparray);
 
@@ -123,7 +123,7 @@ class Compiler
         $this->argumentCount = 0;
 
         // switch() for goto emulation
-        if (!empty($jumpTargets)) {
+        if (!$jumpTargets->isEmpty()) {
             $this->emitLine("var jump = 0;");
             $this->emitLine("goto_emulation:");
             $this->emitLine("while (true) {");
@@ -132,17 +132,17 @@ class Compiler
             $this->indent();
             
             // ensure there's a "case 0:" for the first opcode
-            $jumpTargets[0] = TRUE;
+            $jumpTargets->add(0);
         }
 
         foreach ($oparray as $i => $opline) {
-            if (isset($jumpTargets[$i])) {
+            if ($jumpTargets->has($i)) {
                 $this->emitLine("case " . $i . ":");
             }
             $this->compileOpline($opline);
         }
 
-        if (!empty($jumpTargets)) {
+        if (!$jumpTargets->isEmpty()) {
             // end switch()
             $this->dedent();
             $this->emitLine("}");
@@ -156,18 +156,18 @@ class Compiler
         $this->emitLine('}');
     }
 
-    private function findJumpTargets(OplineArray $oparray): array {
-        $jumpTargets = [];
+    private function findJumpTargets(OplineArray $oparray): IntSet {
+        $jumpTargets = new IntSet;
         
         foreach ($oparray as $i => $opline) {
             if (substr(OPCODE_NAMES[$opline->getType()], 0, 8) === 'ZEND_JMP') {
                 $op1 = $opline->getOperand1();
                 if ($op1 instanceof JumpTargetOperand) {
-                    $jumpTargets[] = $op1->getOplineIndex();
+                    $jumpTargets->add($op1->getOplineIndex());
                 }
                 $op2 = $opline->getOperand2();
                 if ($op2 instanceof JumpTargetOperand) {
-                    $jumpTargets[] = $op2->getOplineIndex();
+                    $jumpTargets->add($op2->getOplineIndex());
                 }
             }
         }
@@ -480,7 +480,7 @@ class Compiler
             throw new \Exception("No such Zend function: $name");
         }
         $functionDependencies = ZEND_FUNCTIONS[$name]['require'] ?? NULL;
-        $this->requiredZendFunctions[$name] = NULL;
+        $this->requiredZendFunctions->add($name);
         if (!empty($functionDependencies)) {
             foreach ($functionDependencies as $function) {
                 $this->requireZendFunction($function);
@@ -489,8 +489,8 @@ class Compiler
     }
 
     private function emitZendFunctions() {
-        foreach ($this->requiredZendFunctions as $key => $value) {
-            $lines = explode("\n", ZEND_FUNCTIONS[$key]['source']);
+        foreach ($this->requiredZendFunctions as $function) {
+            $lines = explode("\n", ZEND_FUNCTIONS[$function]['source']);
             foreach ($lines as $line) {
                 $this->emitLine($line);
             }
