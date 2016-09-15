@@ -30,7 +30,7 @@ class Compiler
         $this->entryPoint = $entryPoint;
     }
 
-    public function compile() {
+    public function compile(): string {
         $this->output = '';
         $this->indentLevel = 0;
         // contains names of opcode implementation functions we need in output
