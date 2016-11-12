@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace ajf\ElePHPants_Love_Coffee\ZendEngine;
 
+use const ajf\ElePHPants_Love_Coffee\OPCODE_NAMES;
+
 class Opline
 {
     private $lineNumber;
