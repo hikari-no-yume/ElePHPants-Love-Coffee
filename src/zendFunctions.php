@@ -12,83 +12,40 @@ namespace ajf\ElePHPants_Love_Coffee;
 // 'require' - an array listing the names of functions this function depends on
 // 'source' - the JavaScript source code of the function itself
 const ZEND_FUNCTIONS = [
-    'zend_long' => [
-        'require' => [],
-        'source' => <<<'JS'
-function zend_long(lval) {
-    this.val = lval;
-}
-JS
-    ],
-    'zend_double' => [
-        'require' => [],
-        'source' => <<<'JS'
-function zend_double(dval) {
-    this.val = dval;
-}
-JS
-    ],
     'zend_compare_function' => [
-        'require' => ['zend_long', 'zend_double'],
+        'require' => [],
+        // TODO: handle strings/arrays/objects
         'source' => <<<'JS'
 function zend_compare_function(op1, op2) {
-    if (!((op1 instanceof zend_long || op1 instanceof zend_double)
-        && (op2 instanceof zend_long || op2 instanceof zend_double))) {
-        throw new Error("Can't handle non-IS_LONG/IS_DOUBLE op1 and op2");
-    }
-
-    var diff = op1.val - op2.val;
-    return new zend_long((diff > 0) ? 1 : (diff < 0) ? -1 : 0);
+    var diff = op1 - op2;
+    return (diff > 0) ? 1 : (diff < 0) ? -1 : 0;
 }
 JS
     ],
     'zend_sub_function' => [
-        'require' => ['zend_long', 'zend_double'],
+        'require' => [],
+        // TODO: handle strings/arrays/objects
         'source' => <<<'JS'
 function zend_sub_function(op1, op2) {
-    if (!((op1 instanceof zend_long || op1 instanceof zend_double)
-        && (op2 instanceof zend_long || op2 instanceof zend_double))) {
-        throw new Error("Can't handle non-IS_LONG/IS_DOUBLE op1 and op2");
-    }
-
-    var resval = op1.val - op2.val;
-    if (op1 instanceof zend_long && op2 instanceof zend_long && (resval | 0) === resval) {
-        return new zend_long(resval);
-    } else {
-        return new zend_double(resval);
-    }
+    return op1 - op2;
 }
 JS
     ],
     'zend_mul_function' => [
-        'require' => ['zend_long', 'zend_double'],
+        'require' => [],
+        // TODO: handle strings/arrays/objects
         'source' => <<<'JS'
 function zend_mul_function(op1, op2) {
-    if (!((op1 instanceof zend_long || op1 instanceof zend_double)
-        && (op2 instanceof zend_long || op2 instanceof zend_double))) {
-        throw new Error("Can't handle non-IS_LONG/IS_DOUBLE op1 and op2");
-    }
-
-    var resval = op1.val * op2.val;
-    if (op1 instanceof zend_long && op2 instanceof zend_long && (resval | 0) === resval) {
-        return new zend_long(resval);
-    } else {
-        return new zend_double(resval);
-    }
+    return op1 * op2;
 }
 JS
     ],
     'zend_is_true' => [
-        'require' => ['zend_long', 'zend_double'],
+        'require' => [],
+        // TODO: handle strings/arrays/objects
         'source' => <<<'JS'
 function zend_is_true(op) {
-    if (op === undefined || op === null || op === false || op === true) {
-        return !!op;
-    } else if (op instanceof zend_long || op instanceof zend_double) {
-        return !!op.val;
-    } else {
-        throw new Error("Can't handle non-IS_UNDEF/IS_NULL/IS_FALSE/IS_TRUE/IS_LONG/IS_DOUBLE op");
-    }
+    return !!op;
 }
 JS
     ],
@@ -105,25 +62,24 @@ function php_var_dump() {
 JS
     ],
     'php_var_dump_inner' => [
-        'require' => ['zend_long', 'zend_double'],
+        'require' => [],
+        // TODO: handle strings/arrays/objects
         'source' => <<<'JS'
 function php_var_dump_inner(value) {
     if (typeof value === "boolean") {
         console.log("bool(" + value + ")");
     } else if (value === null) {
         console.log("NULL");
-    } else if (value instanceof zend_long) {
-        console.log("int(" + value.val + ")");
-    } else if (value instanceof zend_double) {
-        if (!Number.isFinite(value.val)) {
-            console.log("float(" + (value.val < 0 ? "-" : "") + "INF)");
-        } else if (Number.isNaN(value.val)) {
+    } else if (typeof value === "number") {
+        if ((value | 0) === value) {
+            console.log("int(" + value + ")");
+        } else if (!Number.isFinite(value)) {
+            console.log("float(" + (value < 0 ? "-" : "") + "INF)");
+        } else if (Number.isNaN(value)) {
             console.log("float(NAN)");
         } else {
-            console.log("float(" + value.val + ")");
+            console.log("float(" + value + ")");
         }
-    } else {
-        throw new Error("Can't handle non-IS_NULL/IS_FALSE/IS_TRUE/IS_LONG/IS_DOUBLE op");
     }
 }
 JS

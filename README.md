@@ -64,8 +64,8 @@ It probably doesn't work on `PHP-7.1` or `master`.
 
 * null
 * bool (false/true)
-* integer
-* float
+* integer (32-bit) and float
+  * Caveat: both are represented by the JS `Number` type. A `Number` is an “integer” if it has the same value when coerced to a 32-bit signed integer, i.e. `(n|0)===0`. This means some values that would otherwise be floats in PHP become integers, but not the other way around. Fortunately, this is compatible with PHP's type-checking rules (integers are accepted as floats, but not vice-versa).
 
 ### Unsupported types
 
@@ -82,8 +82,8 @@ It probably doesn't work on `PHP-7.1` or `master`.
 * `SEND_VAL`, `SEND_VAL_EX`, `SEND_VAR` (no by-reference support)
 * `DO_FCALL`, `DO_FCALL_BY_NAME`, `DO_ICALL`, `DO_UCALL` (no optimisation for F/I/U cases, no by-reference support, no type-checking)
 * `RECV` (no by-reference support, no type-checking)
-* `IS_SMALLER` (integer/float operands only)
-* `SUB`, `MUL` (integer/float operands only)
+* `IS_SMALLER` (null/bool/integer/float operands only)
+* `SUB`, `MUL` (null/bool/integer/float operands only)
 * `JMP`
 * `JMPZ` (null/bool/integer/float operands only)
 * `QM_ASSIGN` (probably doesn't implement assignment properly)
@@ -118,7 +118,7 @@ Pretty much everything, but particularly:
   * `echo`
 * References
 * Copy-on-write/reference counting (if needed)
-* Type coercion
+* Type coercion (partially)
 * Strict typing
 * Errors (the `trigger_error` kind)
 * Nice error messages

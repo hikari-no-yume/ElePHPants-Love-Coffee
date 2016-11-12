@@ -243,18 +243,13 @@ class ZendToPseudoJSCompiler
 
                 $this->emitStatement(new AssignmentStatement(
                     $this->compileOperandAsLvalue($result),
-                    new TernaryOperation(
-                        new BinaryOperation(
-                            '<',
-                            new PropertyDereference(
-                                $this->compileOperandAsRvalue($result),
-                                'val'
-                            ),
-                            new NumberValue(0)
-                        ),
-                        new BooleanValue(true),
-                        new BooleanValue(false)
-                    )
+                    new BinaryOperation(
+                        '<',
+                        $this->compileOperandAsRvalue($result),
+                        new NumberValue(0)
+                    ),
+                    new BooleanValue(true),
+                    new BooleanValue(false)
                 ));
                 break;
             case ZEND_SUB:
@@ -415,19 +410,9 @@ class ZendToPseudoJSCompiler
                     return new BooleanValue(false);
                 }
             case "integer":
-                $this->requireZendFunction('zend_long');
-
-                return new ConstructorCall(
-                    new GlobalVariable('zend_long'),
-                    new NumberValue((float)$value)
-                );
+                return new NumberValue((float)$value);
             case "double":
-                $this->requireZendFunction('zend_double');
-
-                return new ConstructorCall(
-                    new GlobalVariable('zend_double'),
-                    new NumberValue($value)
-                );
+                return new NumberValue($value);
             default:
                 throw new \Exception("Can't handle literals of type " . gettype($value));
                 break;
