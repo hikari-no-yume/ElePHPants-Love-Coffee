@@ -15,6 +15,11 @@ class ReturnStatement extends Statement
         return $this->value;
     }
 
+    public function walk(callable /*(Node)*/ $visitor) {
+        Node::walk($visitor);
+        $this->value->walk($visitor);
+    }
+
     public function __toString(): string {
         return 'return ' . $this->value->__toString() . ';';
     }

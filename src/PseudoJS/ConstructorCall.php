@@ -21,6 +21,14 @@ class ConstructorCall extends Expression
         return $this->arguments;
     }
 
+    public function walk(callable /*(Node)*/ $visitor) {
+        Node::walk($visitor);
+        $this->constructor->walk($visitor);
+        foreach ($this->arguments as $argument) {
+            $argument->walk($visitor);
+        }
+    }
+
     public function __toString(): string {
         return 'new (' . $this->constructor->__toString() . ')(' . implode(", ", array_map(function (Expression $argument): string {
             return $argument->__toString();

@@ -61,6 +61,12 @@ class BinaryOperation extends Expression
         return $this->rightOperand;
     }
 
+    public function walk(callable /*(Node)*/ $visitor) {
+        Node::walk($visitor);
+        $this->leftOperand->walk($visitor);
+        $this->rightOperand->walk($visitor);
+    }
+
     public function __toString(): string {
         return '(' . $this->leftOperand->__toString() . ') ' . $this->operator . ' (' . $this->rightOperand->__toString() . ')';
     }

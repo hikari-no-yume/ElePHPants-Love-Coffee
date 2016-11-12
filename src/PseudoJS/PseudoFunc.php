@@ -20,6 +20,13 @@ class PseudoFunc extends Func implements \IteratorAggregate
         return new \ArrayIterator($this->statements);
     }
 
+    public function walk(callable /*(Node)*/ $visitor) {
+        Node::walk($visitor);
+        foreach ($this->statements as $statement) {
+            $statement->walk($visitor);
+        }
+    }
+
     public function __toString(): string {
         $str = 'function ' . $this->name . '() {';
         foreach ($this->statements as $statement) {

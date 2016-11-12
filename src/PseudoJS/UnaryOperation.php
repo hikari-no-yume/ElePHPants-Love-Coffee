@@ -35,6 +35,11 @@ class UnaryOperation extends Expression
         return $this->operand;
     }
 
+    public function walk(callable /*(Node)*/ $visitor) {
+        Node::walk($visitor);
+        $this->operand->walk($visitor);
+    }
+
     public function __toString(): string {
         return $this->operator . '(' . $this->operand->__toString() . ')';
     }

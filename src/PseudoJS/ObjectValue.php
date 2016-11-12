@@ -20,6 +20,13 @@ class ObjectValue extends Expression implements \IteratorAggregate
         }
     }
 
+    public function walk(callable /*(Node)*/ $visitor) {
+        Node::walk($visitor);
+        foreach ($this->properties as $value) {
+            $value->walk($visitor);
+        }
+    }
+
     public function __toString(): string {
         $str = '{ ';
         foreach ($this->properties as $name => $value) {

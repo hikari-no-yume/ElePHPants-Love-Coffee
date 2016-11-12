@@ -24,6 +24,11 @@ class PropertyDereference extends Lvalue
         return $this->property;
     }
 
+    public function walk(callable /*(Node)*/ $visitor) {
+        Node::walk($visitor);
+        $this->object->walk($visitor);
+    }
+
     public function __toString(): string {
         return '(' . $this->object->__toString() . ').' . $this->property;
     }

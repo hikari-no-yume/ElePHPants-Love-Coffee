@@ -19,6 +19,7 @@ use ajf\ElePHPants_Love_Coffee\PseudoJS\GotoStatement;
 use ajf\ElePHPants_Love_Coffee\PseudoJS\IfStatement;
 use ajf\ElePHPants_Love_Coffee\PseudoJS\LocalVariable;
 use ajf\ElePHPants_Love_Coffee\PseudoJS\Lvalue;
+use ajf\ElePHPants_Love_Coffee\PseudoJS\Node;
 use ajf\ElePHPants_Love_Coffee\PseudoJS\NullValue;
 use ajf\ElePHPants_Love_Coffee\PseudoJS\NumberValue;
 use ajf\ElePHPants_Love_Coffee\PseudoJS\ObjectValue;
@@ -37,6 +38,7 @@ class PseudoJSToJSCompiler
     private $output;
     private $indentLevel;
     private $declaredVariables;
+    private $argumentNames;
 
     public function __construct(array $functions) {
         $this->functions = $functions;
@@ -109,10 +111,13 @@ class PseudoJSToJSCompiler
             }
             return;
         } else if (!$func instanceof PseudoFunc) {
-            throw new \Exception("Unsupported Func type: " . get_class($func));
+            throw new \Exception("Unsupported Func type: " . \get_class($func));
         }
 
-        $this->emitLine('function ' . $func->getName() . '() {');
+        $this->argumentNames = $this->findAndAllocateArguments($func);
+
+        $this->emitLine('function ' . $func->getName() . '(' . \implode(', ', $this->argumentNames) . ') {');
+
         $this->indent();
 
         $hasGotoLabels = $this->hasGotoLabels($func);
@@ -157,6 +162,27 @@ class PseudoJSToJSCompiler
         }
 
         return false;
+    }
+
+    private function findAndAllocateArguments(PseudoFunc $func): array /*<string>*/ {
+        $largestSeen = NULL;
+        $func->walk(function (Node $node) use (&$largestSeen) {
+            if ($node instanceof Argument) {
+                if (\is_null($largestSeen) || $node->getIndex() > $largestSeen) {
+                    $largestSeen = $node->getIndex();
+                }
+            }
+        });
+
+        $argumentNames = [];
+
+        if (!\is_null($largestSeen)) {
+            for ($i = 0; $i <= $largestSeen; $i++) {
+                $argumentNames[$i] = "arg_$i";
+            }
+        }
+
+        return $argumentNames;
     }
 
     private function compileStatement(Statement $statement) {
@@ -235,7 +261,11 @@ class PseudoJSToJSCompiler
                 $this->compileLvalue($expression);
                 break;
             case $expression instanceof Argument:
-                $this->emit('arguments[' . $expression->getIndex() . ']');
+                $index = $expression->getIndex();
+                if (!isset($this->argumentNames[$index])) {
+                    throw new \Exception("Use of unnamed argument $index");
+                }
+                $this->emit($this->argumentNames[$index]);
                 break;
             case $expression instanceof FunctionCall:
                 $this->compileFunctionCall($expression->getFunction(), $expression->getArguments());

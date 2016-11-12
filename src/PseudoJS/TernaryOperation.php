@@ -31,6 +31,13 @@ class TernaryOperation extends Expression
         return $this->rightExpression;
     }
 
+    public function walk(callable /*(Node)*/ $visitor) {
+        Node::walk($visitor);
+        $this->condition->walk($visitor);
+        $this->leftExpression->walk($visitor);
+        $this->rightExpression->walk($visitor);
+    }
+
     public function __toString(): string {
         return '(' . $this->condition->__toString() . ') ? (' . $this->leftExpression->__toString() . ') : (' . $this->rightExpression->__toString() . ')';
     }

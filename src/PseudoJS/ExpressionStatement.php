@@ -15,6 +15,11 @@ class ExpressionStatement extends Statement
         return $this->expression;
     }
 
+    public function walk(callable /*(Node)*/ $visitor) {
+        Node::walk($visitor);
+        $this->expression->walk($visitor);
+    }
+
     public function __toString(): string {
         return $this->expression->__toString() . ';';
     }

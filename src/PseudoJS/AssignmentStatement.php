@@ -21,6 +21,12 @@ class AssignmentStatement extends Statement
         return $this->value;
     }
 
+    public function walk(callable /*(Node)*/ $visitor) {
+        Node::walk($visitor);
+        $this->target->walk($visitor);
+        $this->value->walk($visitor);
+    }
+
     public function __toString(): string {
         return $this->target->__toString() . ' = ' . $this->value->__toString() . ';';
     }
