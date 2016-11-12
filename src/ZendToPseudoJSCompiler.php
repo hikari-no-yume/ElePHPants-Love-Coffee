@@ -186,16 +186,7 @@ class ZendToPseudoJSCompiler
                     throw new \Exception("Can't find any function by the name '$functionName'");
                 }
 
-                $fcallNumber = $this->fcallInfoStack->height();
-                $this->emitStatement(new AssignmentStatement(
-                    new LocalVariable('fcall' . $fcallNumber . 'Target'),
-                    new GlobalVariable($jsFunctionName)
-                ));
-                $this->fcallInfoStack->push([
-                    'number' => $fcallNumber,
-                    'argumentCount' => 0
-                ]);
-                $this->isFirst = TRUE;
+                $this->beginFunctionCallWithTarget(new GlobalVariable($jsFunctionName));
                 break;
             case ZEND_SEND_VAL:
             case ZEND_SEND_VAL_EX:
@@ -203,13 +194,16 @@ class ZendToPseudoJSCompiler
                 $assert("op2", "NULL");
                 $assert("result", "NULL");
 
-                $fcallInfo = $this->fcallInfoStack->pop();
-                $this->emitStatement(new AssignmentStatement(
-                    new LocalVariable('fcall' . $fcallInfo['number'] . 'Argument' . $fcallInfo['argumentCount']),
-                    $this->compileOperandAsRvalue($op1)
-                ));
-                $fcallInfo['argumentCount']++;
-                $this->fcallInfoStack->push($fcallInfo);
+                $op1Expression = $this->compileOperandAsRvalue($op1);
+                if ($op1 instanceof LiteralOperand) {
+                    $this->addFunctionCallArgument($op1Expression);
+                } else {
+                    $argumentExpression = $this->addFunctionCallVariableArgument();
+                    $this->emitStatement(new AssignmentStatement(
+                        $argumentExpression,
+                        $this->compileOperandAsRvalue($op1)
+                    ));
+                }
                 break;
             case ZEND_DO_FCALL:
             case ZEND_DO_FCALL_BY_NAME:
@@ -218,19 +212,11 @@ class ZendToPseudoJSCompiler
                 $assert("op1", "NULL");
                 $assert("op2", "NULL");
 
-                $fcallInfo = $this->fcallInfoStack->pop();
-
-                $arguments = [];
-                for ($i = 0; $i < $fcallInfo['argumentCount']; $i++) {
-                    $arguments[] = new LocalVariable('fcall' . $fcallInfo['number'] . 'Argument' . $i);
-                }
+                list($target, $arguments) = $this->endFunctionCall();
 
                 $this->emitStatement(new AssignmentStatement(
                     $this->compileOperandAsLvalue($result),
-                    new FunctionCall(
-                        new LocalVariable('fcall' . $fcallInfo['number'] . 'Target'),
-                        ...$arguments
-                    )
+                    new FunctionCall($target, ...$arguments)
                 ));
                 break;
             case ZEND_RECV:
@@ -336,6 +322,51 @@ class ZendToPseudoJSCompiler
                 throw new \Exception("Can't handle opcode " . OPCODE_NAMES[$opline->getType()]);
                 break;
         }
+    }
+
+    private function beginFunctionCallBare() {
+        $fcallNumber = $this->fcallInfoStack->height();
+        $this->fcallInfoStack->push([
+            'number' => $fcallNumber,
+            'target' => null,
+            'arguments' => []
+        ]);
+    }
+
+    private function beginFunctionCallWithTarget(Expression $target) {
+        $this->beginFunctionCallBare();
+        $fcallInfo = $this->fcallInfoStack->pop();
+        $fcallInfo['target'] = $target;
+        $this->fcallInfoStack->push($fcallInfo);
+    }
+
+    // Potential future use
+    private function beginFunctionCallWithVariableTarget(): LocalVariable {
+        $this->beginFunctionCallBare();
+        $fcallInfo = $this->fcallInfoStack->pop();
+        $fcallInfo['target'] = new LocalVariable('fcall' . $fcallInfo['number'] . 'Target');
+        $this->fcallInfoStack->push($fcallInfo);
+        return $fcallInfo['target'];
+    }
+
+    private function addFunctionCallArgument(Expression $argument) {
+        $fcallInfo = $this->fcallInfoStack->pop();
+        $fcallInfo['arguments'][] = $argument;
+        $this->fcallInfoStack->push($fcallInfo);
+        return $argument;
+    }
+
+    private function addFunctionCallVariableArgument(): LocalVariable {
+        $fcallInfo = $this->fcallInfoStack->pop();
+        $argument = new LocalVariable('fcall' . $fcallInfo['number'] . 'Argument' . count($fcallInfo['arguments']));
+        $fcallInfo['arguments'][] = $argument;
+        $this->fcallInfoStack->push($fcallInfo);
+        return $argument;
+    }
+
+    private function endFunctionCall(): array {
+        $fcallInfo = $this->fcallInfoStack->pop();
+        return [$fcallInfo['target'], $fcallInfo['arguments']];
     }
 
     private function compileJump(JumpTargetOperand $op): GotoStatement {
