@@ -31,7 +31,11 @@ if ($dump) {
         echo $function, PHP_EOL;
     }
 } else {
-    $compiler = new Compiler($functions, "(null)");
+    $pseudoJSCompiler = new ZendToPseudoJSCompiler($functions, "(null)");
 
-    echo $compiler->compile();
+    $pseudoJSFunctions = $pseudoJSCompiler->compile();
+
+    $jsCompiler = new PseudoJSToJSCompiler($pseudoJSFunctions);
+
+    echo $jsCompiler->compile();
 }
